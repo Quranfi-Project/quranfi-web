@@ -72,10 +72,18 @@ const ROADMAP_DATA: RoadmapItem[] = [
   {
     id: 9,
     title: 'Word by Word ',
-    description: 'Add Wordy by Word Ayahs for memorization',
+    description: 'Add Word by Word Ayahs for memorization',
     status: 'planned',
     type: 'feature',
     targetDate: '2025-6-30'
+  },
+    {
+    id: 10,
+    title: 'Fixed a couple of bugs ',
+    description: 'Fixed some repeating issues ',
+    status: 'completed',
+    type: 'bug',
+    targetDate: '2025-11-16'
   },
 ];
 

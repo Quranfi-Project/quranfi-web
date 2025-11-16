@@ -76,24 +76,27 @@ const CustomAudioPlayer = forwardRef<AudioPlayerRef, {
 
   useEffect(() => {
     const audio = audioRef.current;
-    if (audio) {
-      const handleEnded = () => {
-        if (repeatCount > 0 && completedRepeats < repeatCount) {
-          setCompletedRepeats(prev => prev + 1);
-          audio.currentTime = 0;
-          audio.play();
-        } else {
-          setIsPlaying(false);
-          setCompletedRepeats(0);
-          onEnded?.();
-        }
-      };
-      
-      audio.addEventListener('ended', handleEnded);
-      return () => {
-        audio.removeEventListener('ended', handleEnded);
-      };
+if (audio) {
+  const handleEnded = () => {
+    // completedRepeats counts how many TIMES we've restarted the audio so far
+    // We restart only if completedRepeats + 1 < repeatCount
+    if (completedRepeats + 1 < repeatCount) {
+      setCompletedRepeats(prev => prev + 1);
+      audio.currentTime = 0;
+      audio.play();
+    } else {
+      setIsPlaying(false);
+      setCompletedRepeats(0); // reset
+      onEnded?.();
     }
+  };
+
+  audio.addEventListener('ended', handleEnded);
+  return () => {
+    audio.removeEventListener('ended', handleEnded);
+  };
+}
+
   }, [audioUrl, onEnded, repeatCount, completedRepeats]);
 
   const handleSeek = (time: number) => {

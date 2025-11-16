@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import supabase  from '../utils/supbase';
+import { getBookmarks, removeBookmark as removeBookmarkDB } from '../utils/bookmarksDB';
 import { FaArrowLeft, FaQuran } from 'react-icons/fa';
+import { bookmarkChannel } from "../utils/sync";
 
 type Bookmark = {
   id: string;
@@ -14,75 +15,52 @@ const Bookmarks = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Fetch bookmarks based on user/guest status
+  // Load bookmarks from IndexedDB
   useEffect(() => {
-    const fetchBookmarks = async () => {
+    const loadBookmarks = async () => {
       setLoading(true);
+
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        const user = session?.user;
-
-        let query = supabase
-          .from('bookmarks')
-          .select('id, verse_id, created_at')
-          .order('created_at', { ascending: false });
-
-        if (user) {
-          // Fetch user's bookmarks
-          query = query.eq('user_id', user.id);
-        } else {
-          // Fetch guest bookmarks
-          const guestId = localStorage.getItem('guest_session_id');
-          if (guestId) {
-            query = query.eq('guest_session_id', guestId);
-          } else {
-            setBookmarks([]);
-            setLoading(false);
-            return;
-          }
-        }
-
-        const { data, error } = await query;
-
-        if (error) throw error;
+        const data = await getBookmarks();
         setBookmarks(data || []);
       } catch (error) {
-        console.error('Error fetching bookmarks:', error);
+        console.error("Error loading bookmarks:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchBookmarks();
+    loadBookmarks();
   }, []);
 
-  // Extract surah and ayah number from verse_id (format: "surah:ayah")
+  // Parse "surah:ayah"
   const parseVerseId = (verseId: string) => {
     const [surahNumber, ayahNumber] = verseId.split(':');
-    return { surahNumber: parseInt(surahNumber), ayahNumber: parseInt(ayahNumber) };
+    return { surahNumber: Number(surahNumber), ayahNumber: Number(ayahNumber) };
   };
 
-  // Navigate to the surah and scroll to the bookmarked ayah
+  // Navigate to verse
   const navigateToVerse = (verseId: string) => {
     const { surahNumber, ayahNumber } = parseVerseId(verseId);
     navigate(`/surah/${surahNumber}#ayah-${ayahNumber}`);
   };
 
-  // Remove a bookmark
-  const removeBookmark = async (bookmarkId: string) => {
-    try {
-      const { error } = await supabase
-        .from('bookmarks')
-        .delete()
-        .eq('id', bookmarkId);
+  // Remove bookmark
+const handleRemove = async (bookmarkId: string) => {
+  try {
+    await removeBookmarkDB(bookmarkId); // Delete from IndexedDB
 
-      if (error) throw error;
-      
-      setBookmarks(prev => prev.filter(b => b.id !== bookmarkId));
-    } catch (error) {
-      console.error('Error removing bookmark:', error);
-    }
-  };
+    // Update local state
+    setBookmarks(prev => prev.filter(b => b.id !== bookmarkId));
+
+    // 🔥 Notify all tabs + SurahDetail instantly
+    bookmarkChannel.postMessage("BOOKMARKS_UPDATED");
+
+  } catch (error) {
+    console.error("Error removing bookmark:", error);
+  }
+};
+
 
   if (loading) {
     return (
@@ -101,8 +79,10 @@ const Bookmarks = () => {
         >
           <FaArrowLeft size={20} />
         </button>
-        <h1 className="text-2xl font-bold text-center">Your Bookmarks</h1>
-        <div className="w-10"></div> {/* Spacer for alignment */}
+
+        <h1 className="text-2xl font-bold text-center flex-1">Your Bookmarks</h1>
+        
+        <div className="w-10"></div>
       </div>
 
       {bookmarks.length === 0 ? (
@@ -115,24 +95,26 @@ const Bookmarks = () => {
         <div className="space-y-4">
           {bookmarks.map((bookmark) => {
             const { surahNumber, ayahNumber } = parseVerseId(bookmark.verse_id);
-            
+
             return (
               <div 
-                key={bookmark.id} 
+                key={bookmark.id}
                 className="p-4 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow"
               >
                 <div className="flex justify-between items-start">
                   <div>
-                    <h3 
+                    <h3
                       className="text-xl font-bold text-blue-600 hover:underline cursor-pointer"
                       onClick={() => navigateToVerse(bookmark.verse_id)}
                     >
                       Surah {surahNumber}, Ayah {ayahNumber}
                     </h3>
+
                     <p className="text-gray-500 text-sm">
                       Bookmarked on {new Date(bookmark.created_at).toLocaleDateString()}
                     </p>
                   </div>
+
                   <div className="flex space-x-2">
                     <button
                       onClick={() => navigateToVerse(bookmark.verse_id)}
@@ -140,8 +122,9 @@ const Bookmarks = () => {
                     >
                       Go to Verse
                     </button>
+
                     <button
-                      onClick={() => removeBookmark(bookmark.id)}
+                      onClick={() => handleRemove(bookmark.id)}
                       className="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
                     >
                       Remove
