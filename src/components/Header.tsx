@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { RxHamburgerMenu } from "react-icons/rx";
 // import { FaUserCircle, FaCog, FaBookmark, FaSignOutAlt } from "react-icons/fa";
 import word from "../assets/Quranfi(word).svg";
-import { useRef } from 'react';
+// import { useRef } from 'react';
 
 interface HeaderProps {
   toggleSidebar: () => void;
