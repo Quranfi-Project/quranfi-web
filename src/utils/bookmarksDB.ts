@@ -5,7 +5,7 @@ import { openDB } from 'idb';
 // --------------------------------------------------
 export const initDB = async () => {
   return await openDB('quranfi-db', 3, {
-    upgrade(db, oldVersion, newVersion, transaction) {
+    upgrade(db, _oldVersion, _newVersion, transaction) {
       // If store exists, possibly migrate it
       if (db.objectStoreNames.contains('bookmarks')) {
         const store = transaction.objectStore('bookmarks');

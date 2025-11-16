@@ -1,29 +1,29 @@
 import { Link } from 'react-router-dom';
 import { RxHamburgerMenu } from "react-icons/rx";
-import { FaUserCircle, FaCog, FaBookmark, FaSignOutAlt } from "react-icons/fa";
+// import { FaUserCircle, FaCog, FaBookmark, FaSignOutAlt } from "react-icons/fa";
 import word from "../assets/Quranfi(word).svg";
-import { useState, useEffect, useRef } from 'react';
+// import { useRef } from 'react';
 
 interface HeaderProps {
   toggleSidebar: () => void;
 }
 
 const Header = ({ toggleSidebar }: HeaderProps) => {
-  const [user] = useState<any>(null); // Always null for now (no auth system)
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  // const [user] = useState<any>(null); // Always null for now (no auth system)
+  // const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  // const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsDropdownOpen(false);
-      }
-    };
+  // useEffect(() => {
+  //   const handleClickOutside = (event: MouseEvent) => {
+  //     if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+  //       setIsDropdownOpen(false);
+  //     }
+  //   };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  //   document.addEventListener('mousedown', handleClickOutside);
+  //   return () => document.removeEventListener('mousedown', handleClickOutside);
+  // }, []);
 
   return (
     <header className="bg-white shadow-md relative">

@@ -22,7 +22,7 @@ const SurahDetail = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [fontSize, setFontSize] = useState<number>(2);
   const [repeatCount, setRepeatCount] = useState<number>(1);
-  const [currentRepeat, setCurrentRepeat] = useState<number>(0);
+  const [, setCurrentRepeat] = useState<number>(0);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const chapterAudioPlayerRef = useRef<AudioPlayerRef>(null);
