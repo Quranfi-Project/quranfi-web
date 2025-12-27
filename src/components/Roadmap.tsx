@@ -85,6 +85,14 @@ const ROADMAP_DATA: RoadmapItem[] = [
     type: 'bug',
     targetDate: '2025-11-16'
   },
+  {
+    id: 11,
+    title: 'Updated Privacy Policy ',
+    description: 'Removed Muslim Ads Network off the site ',
+    status: 'completed',
+    type: 'enhancement',
+    targetDate: '2025-12-27'
+  },
 ];
 
 const STATUS_DISPLAY_ORDER: RoadmapStatus[] = ['completed', 'in-progress', 'planned'];
