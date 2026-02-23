@@ -4,10 +4,41 @@ import axios from 'axios';
 const ALQURAN_BASE = 'https://api.alquran.cloud/v1';
 const ALQURAN_CDN = 'https://cdn.islamic.network/quran/audio/128';
 const ALQURAN_SURAH_CDN = 'https://cdn.islamic.network/quran/audio-surah/128';
+const EVERYAYAH_CDN = 'https://everyayah.com/data';
 
 // Old API (kept as fallback)
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 const AUDIO_URL = process.env.NEXT_PUBLIC_API_AUDIO_URL;
+
+// EveryAyah reciters not available on Al-Quran Cloud
+// identifier format: "everyayah:{folder}"
+const EVERYAYAH_RECITERS: { identifier: string; name: string }[] = [
+  { identifier: 'everyayah:Abdul_Basit_Murattal_192kbps',           name: 'Abdul Basit Murattal' },
+  { identifier: 'everyayah:Abdul_Basit_Mujawwad_128kbps',           name: 'Abdul Basit Mujawwad' },
+  { identifier: 'everyayah:Minshawy_Murattal_128kbps',              name: 'Minshawy Murattal' },
+  { identifier: 'everyayah:Minshawy_Mujawwad_192kbps',              name: 'Minshawy Mujawwad' },
+  { identifier: 'everyayah:Ghamadi_40kbps',                         name: 'Ghamadi' },
+  { identifier: 'everyayah:Mohammad_al_Tablaway_128kbps',           name: 'Mohammad Al-Tablaway' },
+  { identifier: 'everyayah:Mustafa_Ismail_48kbps',                  name: 'Mustafa Ismail' },
+  { identifier: 'everyayah:Husary_Muallim_128kbps',                 name: 'Husary (Muallim / Teaching)' },
+  { identifier: 'everyayah:Khaalid_Abdullaah_al-Qahtaanee_192kbps', name: 'Khalid Al-Qahtani' },
+  { identifier: 'everyayah:Yasser_Ad-Dussary_128kbps',              name: 'Yasser Ad-Dussary' },
+  { identifier: 'everyayah:Nasser_Alqatami_128kbps',                name: 'Nasser Alqatami' },
+  { identifier: 'everyayah:Salaah_AbdulRahman_Bukhatir_128kbps',   name: 'Salaah Bukhatir' },
+  { identifier: 'everyayah:Muhsin_Al_Qasim_192kbps',               name: 'Muhsin Al-Qasim' },
+  { identifier: 'everyayah:Abdullaah_3awwaad_Al-Juhaynee_128kbps', name: 'Abdullah Al-Juhaynee' },
+  { identifier: 'everyayah:Salah_Al_Budair_128kbps',               name: 'Salah Al-Budair' },
+  { identifier: 'everyayah:Abdullah_Matroud_128kbps',              name: 'Abdullah Matroud' },
+  { identifier: 'everyayah:Muhammad_AbdulKareem_128kbps',          name: 'Muhammad AbdulKareem' },
+  { identifier: 'everyayah:Ali_Jaber_64kbps',                      name: 'Ali Jaber' },
+  { identifier: 'everyayah:Fares_Abbad_64kbps',                    name: 'Fares Abbad' },
+  { identifier: 'everyayah:Akram_AlAlaqimy_128kbps',               name: 'Akram Al-Alaqimy' },
+  { identifier: 'everyayah:Sahl_Yassin_128kbps',                   name: 'Sahl Yassin' },
+  { identifier: 'everyayah:Yaser_Salamah_128kbps',                 name: 'Yaser Salamah' },
+  { identifier: 'everyayah:Ahmed_Neana_128kbps',                   name: 'Ahmed Neana' },
+  { identifier: 'everyayah:warsh/warsh_Abdul_Basit_128kbps',       name: 'Abdul Basit (Warsh)' },
+  { identifier: 'everyayah:warsh/warsh_ibrahim_aldosary_128kbps',  name: 'Ibrahim Al-Dosary (Warsh)' },
+];
 
 // Fetch all Surahs — Al-Quran Cloud primary, old API fallback
 export const fetchSurahs = async () => {
@@ -65,43 +96,67 @@ export const fetchAyah = async (surahNumber: number, ayahNumber: number) => {
   return response.data;
 };
 
-// Fetch reciters — Al-Quran Cloud primary, old API fallback
+// Fetch reciters — Al-Quran Cloud + EveryAyah merged, old API fallback
 export const fetchReciters = async (): Promise<{ [key: string]: string }> => {
+  let result: { [key: string]: string } = {};
+
   try {
     const response = await axios.get(
       `${ALQURAN_BASE}/edition?format=audio&language=ar&type=versebyverse`
     );
-    const result: { [key: string]: string } = {};
     response.data.data.forEach((r: any) => {
       result[r.identifier] = r.englishName;
     });
-    return result;
   } catch {
     const response = await axios.get(`${BASE_URL}/reciters.json`);
-    return response.data;
+    result = response.data;
   }
+
+  // Merge EveryAyah reciters
+  EVERYAYAH_RECITERS.forEach(({ identifier, name }) => {
+    result[identifier] = name;
+  });
+
+  return result;
 };
 
-// Verse audio — returns primary (Al-Quran Cloud CDN) and fallback (old API) URLs
+// Verse audio — returns primary + fallback URLs
+// Handles both Al-Quran Cloud and EveryAyah reciters
 export const fetchVerseAudio = (
   reciterIdentifier: string,
   globalAyahNumber: number | null,
   surahNumber: number,
   ayahNumber: number
-): { primary: string | null; fallback: string | null } => ({
-  primary: globalAyahNumber != null
-    ? `${ALQURAN_CDN}/${reciterIdentifier}/${globalAyahNumber}.mp3`
-    : null,
-  fallback: AUDIO_URL
-    ? `${AUDIO_URL}/${reciterIdentifier}/${surahNumber}_${ayahNumber}.mp3`
-    : null,
-});
+): { primary: string | null; fallback: string | null } => {
+  if (reciterIdentifier.startsWith('everyayah:')) {
+    const folder = reciterIdentifier.slice('everyayah:'.length);
+    const s = surahNumber.toString().padStart(3, '0');
+    const a = ayahNumber.toString().padStart(3, '0');
+    return {
+      primary: `${EVERYAYAH_CDN}/${folder}/${s}${a}.mp3`,
+      fallback: null,
+    };
+  }
 
-// Chapter audio — returns primary (Al-Quran Cloud CDN) and fallback (old API) URLs
+  return {
+    primary: globalAyahNumber != null
+      ? `${ALQURAN_CDN}/${reciterIdentifier}/${globalAyahNumber}.mp3`
+      : null,
+    fallback: AUDIO_URL
+      ? `${AUDIO_URL}/${reciterIdentifier}/${surahNumber}_${ayahNumber}.mp3`
+      : null,
+  };
+};
+
+// Chapter audio — EveryAyah has no chapter-level files, returns null for those reciters
 export const getChapterAudioUrl = async (
   reciterIdentifier: string,
   surahNumber: number
-): Promise<{ primary: string; fallback: string | null }> => {
+): Promise<{ primary: string | null; fallback: string | null }> => {
+  if (reciterIdentifier.startsWith('everyayah:')) {
+    return { primary: null, fallback: null };
+  }
+
   const primary = `${ALQURAN_SURAH_CDN}/${reciterIdentifier}/${surahNumber}.mp3`;
   let fallback: string | null = null;
   if (BASE_URL) {
