@@ -25,7 +25,7 @@ const DuaList = () => {
   // });
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Duas: Coming Soon</h1>
+      <h1 className="text-2xl font-bold mb-4 dark:text-gray-100">Duas: Coming Soon</h1>
       {/* <div className="mb-4">
         <input
           type="text"

@@ -1,3 +1,5 @@
+'use client'
+
 import { useState } from 'react';
 
 type RoadmapStatus = 'planned' | 'in-progress' | 'completed';
@@ -50,8 +52,9 @@ const ROADMAP_DATA: RoadmapItem[] = [
     id: 5,
     title: 'Dark Mode Support',
     description: 'Implement dark/light theme toggle',
-    status: 'planned',
-    type: 'enhancement'
+    status: 'completed',
+    type: 'enhancement',
+    completedDate: '2026-2-22'
   },
   {
     id: 6,
@@ -77,7 +80,7 @@ const ROADMAP_DATA: RoadmapItem[] = [
     type: 'feature',
     targetDate: '2025-6-30'
   },
-    {
+  {
     id: 10,
     title: 'Fixed a couple of bugs ',
     description: 'Fixed some repeating issues ',
@@ -101,15 +104,15 @@ const Roadmap = () => {
   const [roadmapItems] = useState<RoadmapItem[]>(ROADMAP_DATA);
 
   const statusStyles: Record<RoadmapStatus, string> = {
-    planned: 'bg-gray-100 text-gray-800',
-    'in-progress': 'bg-blue-100 text-blue-800',
-    completed: 'bg-green-100 text-green-800'
+    planned: 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200',
+    'in-progress': 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200',
+    completed: 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
   };
 
   const typeStyles: Record<RoadmapType, string> = {
-    feature: 'bg-purple-100 text-purple-800',
-    bug: 'bg-red-100 text-red-800',
-    enhancement: 'bg-yellow-100 text-yellow-800'
+    feature: 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200',
+    bug: 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200',
+    enhancement: 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200'
   };
 
   const statusLabels: Record<RoadmapStatus, string> = {
@@ -124,44 +127,44 @@ const Roadmap = () => {
     enhancement: 'enhancement'
   };
 
-  const getStatusCount = (status: RoadmapStatus) => 
+  const getStatusCount = (status: RoadmapStatus) =>
     roadmapItems.filter(item => item.status === status).length;
 
   return (
     <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-8 text-center">Website Roadmap</h1>
-      
-      <div className="mb-8 p-6 bg-white rounded-lg shadow-md">
-        <h2 className="text-xl font-semibold mb-4">Current Version: 1.2.0</h2>
+      <h1 className="text-3xl font-bold mb-8 text-center dark:text-gray-100">Website Roadmap</h1>
+
+      <div className="mb-8 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-100 dark:border-gray-700">
+        <h2 className="text-xl font-semibold mb-4 dark:text-gray-100">Current Version: 1.2.0</h2>
         <div className="flex flex-wrap gap-4">
           <div className="flex items-center">
             <span className="w-3 h-3 rounded-full bg-green-500 mr-2"></span>
-            <span>Completed: {getStatusCount('completed')}</span>
+            <span className="dark:text-gray-300">Completed: {getStatusCount('completed')}</span>
           </div>
           <div className="flex items-center">
             <span className="w-3 h-3 rounded-full bg-blue-500 mr-2"></span>
-            <span>In Progress: {getStatusCount('in-progress')}</span>
+            <span className="dark:text-gray-300">In Progress: {getStatusCount('in-progress')}</span>
           </div>
           <div className="flex items-center">
             <span className="w-3 h-3 rounded-full bg-gray-500 mr-2"></span>
-            <span>Planned: {getStatusCount('planned')}</span>
+            <span className="dark:text-gray-300">Planned: {getStatusCount('planned')}</span>
           </div>
         </div>
-        <p className="text-gray-600 mt-2">Last updated: {new Date().toLocaleDateString()}</p>
+        <p className="text-gray-600 dark:text-gray-400 mt-2">Last updated: {new Date().toLocaleDateString()}</p>
       </div>
 
       <div className="space-y-8">
         {STATUS_DISPLAY_ORDER.map((status) => (
           <div key={status}>
-            <h2 className="text-2xl font-semibold mb-4 capitalize">
+            <h2 className="text-2xl font-semibold mb-4 capitalize dark:text-gray-100">
               {statusLabels[status]} ({getStatusCount(status)})
             </h2>
-            
+
             <div className="space-y-4">
               {roadmapItems
                 .filter(item => item.status === status)
                 .map(item => (
-                  <RoadmapCard 
+                  <RoadmapCard
                     key={item.id}
                     item={item}
                     statusStyle={statusStyles[status]}
@@ -180,8 +183,8 @@ const Roadmap = () => {
   );
 };
 
-const RoadmapCard = ({ 
-  item, 
+const RoadmapCard = ({
+  item,
   statusStyle,
   statusLabel,
   typeStyle,
@@ -193,9 +196,9 @@ const RoadmapCard = ({
   typeStyle: string;
   typeLabel: string;
 }) => (
-  <div className="p-6 bg-white rounded-lg shadow-sm border-l-4 border-blue-500">
+  <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm border-l-4 border-blue-500 border border-gray-100 dark:border-gray-700">
     <div className="flex justify-between items-start mb-2">
-      <h3 className="text-lg font-medium">{item.title}</h3>
+      <h3 className="text-lg font-medium dark:text-gray-100">{item.title}</h3>
       <div className="flex gap-2">
         <span className={`px-3 py-1 rounded-full text-sm font-medium ${typeStyle}`}>
           {typeLabel}
@@ -205,10 +208,10 @@ const RoadmapCard = ({
         </span>
       </div>
     </div>
-    
-    <p className="text-gray-600 mt-1 mb-4">{item.description}</p>
-    
-    <div className="flex flex-wrap gap-4 text-sm text-gray-500">
+
+    <p className="text-gray-600 dark:text-gray-400 mt-1 mb-4">{item.description}</p>
+
+    <div className="flex flex-wrap gap-4 text-sm text-gray-500 dark:text-gray-500">
       {item.targetDate && (
         <div>
           <span className="font-medium">Target:</span> {new Date(item.targetDate).toLocaleDateString()}
@@ -224,24 +227,24 @@ const RoadmapCard = ({
 );
 
 const FeatureSuggestionSection = () => (
-<div className="mt-12 p-6 bg-blue-50 rounded-lg">
-  <h2 className="text-xl font-semibold mb-4">Suggest an Improvement</h2>
-  <p className="mb-4">Have an idea for improving Quranify? We'd love to hear it!</p>
-  <div className="flex flex-wrap gap-4">
-    <button 
-      onClick={() => window.open('https://github.com/EasyCanadianGamer/quranify/issues/new?template=feature_request.md', '_blank')}
-      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-    >
-      Submit Feature Request
-    </button>
-    <button 
-      onClick={() => window.open('https://github.com/EasyCanadianGamer/quranify/issues/new?template=bug_report.md', '_blank')}
-      className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
-    >
-      Report a Bug
-    </button>
+  <div className="mt-12 p-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800">
+    <h2 className="text-xl font-semibold mb-4 dark:text-gray-100">Suggest an Improvement</h2>
+    <p className="mb-4 text-gray-700 dark:text-gray-300">Have an idea for improving Quranify? We&apos;d love to hear it!</p>
+    <div className="flex flex-wrap gap-4">
+      <button
+        onClick={() => window.open('https://github.com/EasyCanadianGamer/quranify/issues/new?template=feature_request.md', '_blank')}
+        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+      >
+        Submit Feature Request
+      </button>
+      <button
+        onClick={() => window.open('https://github.com/EasyCanadianGamer/quranify/issues/new?template=bug_report.md', '_blank')}
+        className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
+      >
+        Report a Bug
+      </button>
+    </div>
   </div>
-</div>
 );
 
 export default Roadmap;
