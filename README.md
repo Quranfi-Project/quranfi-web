@@ -57,3 +57,8 @@ This project is licensed under the MIT License. See the `LICENSE` file for detai
 ---
 
 For more details, visit the [GitHub repository](https://github.com/EasyCanadianGamer/quranify).
+
+---
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Quranify-Project/quranify-web&type=date&legend=top-left)](https://www.star-history.com/#Quranify-Project/quranify-web&type=date&legend=top-left)

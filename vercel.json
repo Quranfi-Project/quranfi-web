@@ -1,5 +1,3 @@
 {
-    "rewrites": [
-      {"source": "/:a*", "destination": "/"}
-    ]
-  }
+  "framework": "nextjs"
+}

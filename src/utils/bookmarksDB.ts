@@ -1,11 +1,11 @@
 import { openDB } from 'idb';
 
 // --------------------------------------------------
-// Initialize DB with migration support (v3)
+// Initialize DB with migration support (v4)
 // --------------------------------------------------
 export const initDB = async () => {
-  return await openDB('quranfi-db', 3, {
-    upgrade(db, _oldVersion, _newVersion, transaction) {
+  return await openDB('quranfi-db', 4, {
+    upgrade(db, oldVersion, _newVersion, transaction) {
       // If store exists, possibly migrate it
       if (db.objectStoreNames.contains('bookmarks')) {
         const store = transaction.objectStore('bookmarks');
@@ -31,7 +31,7 @@ export const initDB = async () => {
 
           // Reinsert data
           setTimeout(async () => {
-            const newDB = await openDB('quranfi-db', 3);
+            const newDB = await openDB('quranfi-db', 4);
             const tx = newDB.transaction('bookmarks', 'readwrite');
             const s = tx.objectStore('bookmarks');
 
@@ -48,6 +48,13 @@ export const initDB = async () => {
       } else {
         // First-time install
         db.createObjectStore('bookmarks', { keyPath: 'id' });
+      }
+
+      // v4: add pageBookmarks store
+      if (oldVersion < 4) {
+        if (!db.objectStoreNames.contains('pageBookmarks')) {
+          db.createObjectStore('pageBookmarks', { keyPath: 'id' });
+        }
       }
     }
   });
@@ -75,4 +82,38 @@ export const getBookmarks = async () => {
 export const removeBookmark = async (id: string) => {
   const db = await initDB();
   return await db.delete('bookmarks', id);
+};
+
+// --------------------------------------------------
+// Page bookmark types and CRUD (v4)
+// --------------------------------------------------
+export type PageBookmark = {
+  id: string;          // "page:42"
+  pageNumber: number;
+  created_at: string;
+};
+
+export const addPageBookmark = async (pageNumber: number): Promise<void> => {
+  const db = await initDB();
+  await db.put('pageBookmarks', {
+    id: `page:${pageNumber}`,
+    pageNumber,
+    created_at: new Date().toISOString(),
+  });
+};
+
+export const removePageBookmark = async (pageNumber: number): Promise<void> => {
+  const db = await initDB();
+  await db.delete('pageBookmarks', `page:${pageNumber}`);
+};
+
+export const getPageBookmarks = async (): Promise<PageBookmark[]> => {
+  const db = await initDB();
+  return await db.getAll('pageBookmarks');
+};
+
+export const isPageBookmarked = async (pageNumber: number): Promise<boolean> => {
+  const db = await initDB();
+  const record = await db.get('pageBookmarks', `page:${pageNumber}`);
+  return record !== undefined;
 };
