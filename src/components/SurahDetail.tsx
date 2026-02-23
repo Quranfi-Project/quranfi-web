@@ -19,7 +19,7 @@ const SurahDetail = () => {
   const [bookmarks, setBookmarks] = useState<Set<string>>(new Set());
   const [reciters, setReciters] = useState<{ [key: string]: string }>({});
   const [selectedReciter, setSelectedReciter] = useState<string>('ar.alafasy');
-  const [chapterAudioUrls, setChapterAudioUrls] = useState<{ primary: string; fallback: string | null } | null>(null);
+  const [chapterAudioUrls, setChapterAudioUrls] = useState<{ primary: string | null; fallback: string | null } | null>(null);
   const [currentVerseIndex, setCurrentVerseIndex] = useState<number | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -358,17 +358,19 @@ const SurahDetail = () => {
         })}
       </div>
 
-      {/* Footer Player */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-gray-900/95
-        backdrop-blur-sm shadow-2xl border-t border-gray-200 dark:border-gray-700 p-3">
-        <CustomAudioPlayer
-          ref={chapterAudioPlayerRef}
-          audioUrl={chapterAudioUrls?.primary ?? ''}
-          fallbackUrl={chapterAudioUrls?.fallback}
-          title={`${surah.surahName} — ${surah.surahNameArabic}`}
-          onPlay={() => stopAllAudio()}
-        />
-      </div>
+      {/* Footer Player — hidden for EveryAyah reciters (no chapter-level audio) */}
+      {chapterAudioUrls?.primary && (
+        <div className="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-gray-900/95
+          backdrop-blur-sm shadow-2xl border-t border-gray-200 dark:border-gray-700 p-3">
+          <CustomAudioPlayer
+            ref={chapterAudioPlayerRef}
+            audioUrl={chapterAudioUrls.primary}
+            fallbackUrl={chapterAudioUrls.fallback}
+            title={`${surah.surahName} — ${surah.surahNameArabic}`}
+            onPlay={() => stopAllAudio()}
+          />
+        </div>
+      )}
 
     </div>
   );
