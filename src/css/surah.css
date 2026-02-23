@@ -12,3 +12,8 @@
  .font-arabic{
     font-family: 'HafsNastaleeqVer10', Arial, sans-serif;
  }
+
+ /* For Uthmani script (reading mode) — Amiri Quran has full support for Quranic annotation marks */
+ .font-arabic-quran {
+    font-family: 'Amiri Quran', 'HafsNastaleeqVer10', Arial, sans-serif;
+ }

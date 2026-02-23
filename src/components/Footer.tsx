@@ -1,9 +1,9 @@
 
 import { FaGithub, FaTwitter, FaLinkedin } from 'react-icons/fa';
-  
+
 const Footer = () => {
   return (
-    <footer className="bg-gray-100 text-black py-6 mt-8">
+    <footer className="bg-gray-100 dark:bg-gray-800 text-black dark:text-gray-200 py-6 mt-8">
       <div className="container mx-auto px-4">
         {/* Flex container for the main footer content */}
         <div className="flex flex-col md:flex-row justify-between items-center md:items-start space-y-4 md:space-y-0">
@@ -13,13 +13,13 @@ const Footer = () => {
               &copy; {new Date().getFullYear()} Quranify. MIT Lisences | Opensource.
             </p>
             <div className="mt-2 space-x-4">
-              <a href="/about" className="text-sm hover:text-blue-700">
+              <a href="/about" className="text-sm hover:text-blue-700 dark:hover:text-blue-400">
                 About
               </a>
-              <a href="/contact" className="text-sm hover:text-blue-700">
+              <a href="/contact" className="text-sm hover:text-blue-700 dark:hover:text-blue-400">
                 Contact
               </a>
-              <a href="/privacy" className="text-sm hover:text-blue-700">
+              <a href="/privacy" className="text-sm hover:text-blue-700 dark:hover:text-blue-400">
                 Privacy Policy
               </a>
             </div>
@@ -28,12 +28,21 @@ const Footer = () => {
           {/* Middle Section: Attribution */}
           <div className="text-center">
             <p className="text-sm">
-              Data provided by{' '}
+              Audio data by{' '}
+              <a
+                href="https://alquran.cloud/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
+              >
+                Al-Quran Cloud
+              </a>
+              {' '}&amp;{' '}
               <a
                 href="https://quranapi.pages.dev/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-400 hover:text-blue-300"
+                className="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
               >
                 QuranAPI
               </a>
@@ -42,7 +51,7 @@ const Footer = () => {
                 href="https://github.com/alif-type/amiri"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-400 hover:text-blue-300"
+                className="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
               >
                 Amiri Quran
               </a>
@@ -56,7 +65,7 @@ const Footer = () => {
               href="https://github.com/EasyCanadianGamer/quranify"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-400 hover:text-blue-700"
+              className="text-gray-400 hover:text-blue-700 dark:hover:text-blue-400"
             >
               <FaGithub size={20} />
             </a>
@@ -64,7 +73,7 @@ const Footer = () => {
               href="https://x.com/C_G_2_3"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-400 hover:text-blue-700"
+              className="text-gray-400 hover:text-blue-700 dark:hover:text-blue-400"
             >
               <FaTwitter size={20} />
             </a>
@@ -72,7 +81,7 @@ const Footer = () => {
               href="https://linkedin.com/in/eyadm"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-400 hover:text-blue-700"
+              className="text-gray-400 hover:text-blue-700 dark:hover:text-blue-400"
             >
               <FaLinkedin size={20} />
             </a>
@@ -81,8 +90,8 @@ const Footer = () => {
 
         {/* App Version */}
         <div className="text-center mt-4">
-          <p className="text-xs text-gray-400">
-            Version 1.0.0 | Built with ❤️ using React, Vite, and Tailwind CSS
+          <p className="text-xs text-gray-400 dark:text-gray-500">
+            Version 1.0.0 | Built with ❤️ using Next.js and Tailwind CSS
           </p>
         </div>
       </div>

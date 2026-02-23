@@ -1,38 +1,24 @@
-import { Link } from 'react-router-dom';
+'use client'
+
+import Link from 'next/link';
 import { RxHamburgerMenu } from "react-icons/rx";
-// import { FaUserCircle, FaCog, FaBookmark, FaSignOutAlt } from "react-icons/fa";
-import word from "../assets/Quranfi(word).svg";
-// import { useRef } from 'react';
+import { FaMoon, FaSun } from 'react-icons/fa';
 
 interface HeaderProps {
   toggleSidebar: () => void;
+  toggleDarkMode: () => void;
+  isDarkMode: boolean;
 }
 
-const Header = ({ toggleSidebar }: HeaderProps) => {
-  // const [user] = useState<any>(null); // Always null for now (no auth system)
-  // const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  // const dropdownRef = useRef<HTMLDivElement>(null);
-
-  // Close dropdown when clicking outside
-  // useEffect(() => {
-  //   const handleClickOutside = (event: MouseEvent) => {
-  //     if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-  //       setIsDropdownOpen(false);
-  //     }
-  //   };
-
-  //   document.addEventListener('mousedown', handleClickOutside);
-  //   return () => document.removeEventListener('mousedown', handleClickOutside);
-  // }, []);
-
+const Header = ({ toggleSidebar, toggleDarkMode, isDarkMode }: HeaderProps) => {
   return (
-    <header className="bg-white shadow-md relative">
+    <header className="bg-white dark:bg-gray-800 shadow-md relative">
       <div className="container mx-auto p-4 flex items-center">
 
         {/* Left hamburger */}
-        <button 
+        <button
           onClick={toggleSidebar}
-          className="text-gray-600 hover:text-gray-900 mr-4"
+          className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white mr-4"
           aria-label="Toggle sidebar"
         >
           <RxHamburgerMenu size={24} />
@@ -40,45 +26,19 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
 
         {/* Center logo */}
         <div className="flex-1 flex justify-center">
-          <Link to="/" className="text-2xl font-bold text-blue-600">
-            <img src={word} style={{ height: '100px', width: 'auto' }} alt="Quranify" />
+          <Link href="/" className="text-2xl font-bold text-blue-600">
+            <img src="/quranfi-word.svg" style={{ height: '100px', width: 'auto' }} alt="Quranify" />
           </Link>
         </div>
 
-        {/* Right authentication (guest only) 
-        <div className="flex justify-end" ref={dropdownRef}>
-          {/* Guest mode *
-          {!user && (
-            <div className="relative">
-              <button
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="flex items-center px-3 py-2 text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors"
-              >
-                <FaUserCircle className="mr-2" />
-                Account
-              </button>
-
-              {isDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50">
-                  <Link
-                    to="/login"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    onClick={() => setIsDropdownOpen(false)}
-                  >
-                    Login
-                  </Link>
-                  <Link
-                    to="/signup"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    onClick={() => setIsDropdownOpen(false)}
-                  >
-                    Sign Up
-                  </Link>
-                </div>
-              )}
-            </div>
-          )}
-        </div>*/}
+        {/* Right dark mode toggle */}
+        <button
+          onClick={toggleDarkMode}
+          className="ml-4 p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white rounded-lg transition-colors"
+          aria-label="Toggle dark mode"
+        >
+          {isDarkMode ? <FaSun size={20} /> : <FaMoon size={20} />}
+        </button>
 
       </div>
     </header>
