@@ -1,22 +1,26 @@
 // src/utils/api.ts
 import axios from 'axios';
 
+// For Capacitor builds, NEXT_PUBLIC_APP_URL points to the production server.
+// For web builds it's empty so relative URLs are used.
+const APP_BASE = process.env.NEXT_PUBLIC_APP_URL ?? '';
+
 // Fetch all Surahs — Quran Foundation API only (via internal route)
 export const fetchSurahs = async () => {
-  const response = await axios.get('/api/surahs');
+  const response = await axios.get(`${APP_BASE}/api/surahs`);
   return response.data;
 };
 
 // Fetch a specific Surah — Quran Foundation API only (via internal route)
 export const fetchSurah = async (surahNumber: number) => {
-  const response = await axios.get(`/api/surah/${surahNumber}`);
+  const response = await axios.get(`${APP_BASE}/api/surah/${surahNumber}`);
   return response.data;
 };
 
 // Fetch reciters — mp3quran.net (reads with timing data)
 // Returns { [readId]: { name, folderUrl } }
 export const fetchReciters = async (): Promise<Record<string, { name: string; folderUrl: string }>> => {
-  const response = await axios.get('/api/reciters');
+  const response = await axios.get(`${APP_BASE}/api/reciters`);
   return response.data;
 };
 

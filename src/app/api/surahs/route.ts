@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getQuranClient } from '@/lib/quranClient';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
 
 export async function GET() {
   try {
@@ -18,6 +18,6 @@ export async function GET() {
     return NextResponse.json(data);
   } catch (error) {
     console.error('[/api/surahs]', error);
-    return NextResponse.json({ error: 'Failed to fetch surahs' }, { status: 500 });
+    return NextResponse.json([]);
   }
 }
