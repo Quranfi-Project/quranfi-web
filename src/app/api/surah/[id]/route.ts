@@ -1,3 +1,4 @@
+
 import { NextRequest, NextResponse } from 'next/server';
 import quranClient from '@/lib/quranClient';
 
