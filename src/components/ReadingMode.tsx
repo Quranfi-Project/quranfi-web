@@ -268,7 +268,7 @@ const ReadingMode = () => {
                   className={`${getFontSizeClass(fontSize)} font-arabic-quran text-gray-900 dark:text-gray-100 leading-loose`}
                 >
                   {ayah.text}{' '}
-                  <span className="text-gray-400 dark:text-gray-500 text-base">
+                  <span className="text-gold-500 dark:text-gold-400 text-base">
                     ﴿{convertToArabicNumerals(ayah.numberInSurah)}﴾
                   </span>{' '}
                 </span>

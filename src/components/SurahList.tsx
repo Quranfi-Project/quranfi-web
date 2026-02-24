@@ -36,7 +36,7 @@ const SurahList = () => {
           className="w-full p-3 rounded-xl border border-gray-200 dark:border-gray-600
             bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100
             placeholder-gray-400 dark:placeholder-gray-500
-            focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400
+            focus:outline-none focus:ring-2 focus:ring-gold-500 dark:focus:ring-gold-400
             shadow-sm"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -56,7 +56,7 @@ const SurahList = () => {
               {/* Top row: number badge + revelation type */}
               <div className="flex items-center justify-between">
                 <span className="inline-flex items-center justify-center w-8 h-8 rounded-full
-                  bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300
+                  bg-gold-100 dark:bg-gold-900 text-gold-700 dark:text-gold-300
                   text-sm font-bold">
                   {surah.number}
                 </span>
