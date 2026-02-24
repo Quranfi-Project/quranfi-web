@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import quranClient from '@/lib/quranClient';
 
-export const dynamic = 'force-static';
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {

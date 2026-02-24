@@ -2,11 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import quranClient from '@/lib/quranClient';
 
-export const dynamic = 'force-static';
-
-export function generateStaticParams() {
-  return Array.from({ length: 114 }, (_, i) => ({ id: String(i + 1) }));
-}
+export const dynamic = 'force-dynamic';
 
 const PER_PAGE = 50;
 const SAHEEH_INTERNATIONAL = 20;
