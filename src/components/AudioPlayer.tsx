@@ -6,6 +6,9 @@ import { FaPlay, FaPause, FaForward, FaRedo, FaTimes } from 'react-icons/fa';
 export interface AudioPlayerRef {
   play: () => void;
   pause: () => void;
+  seekTo: (seconds: number) => void;
+  playSegment: (startMs: number, endMs: number, onEnd?: () => void) => void;
+  clearSegment: () => void;
   isPlaying: boolean;
 }
 
@@ -26,10 +29,12 @@ const CustomAudioPlayer = forwardRef<AudioPlayerRef, {
   const [showRepeatInput, setShowRepeatInput] = useState(false);
   const [customRepeat, setCustomRepeat] = useState('1');
   const triedFallback = useRef(false);
+  const segmentRef = useRef<{ endSec: number; onEnd?: () => void } | null>(null);
 
-  // Reset fallback flag when audioUrl changes
+  // Reset state when audioUrl changes
   useEffect(() => {
     triedFallback.current = false;
+    segmentRef.current = null;
   }, [audioUrl]);
 
   // Expose methods to parent component
@@ -48,6 +53,23 @@ const CustomAudioPlayer = forwardRef<AudioPlayerRef, {
         onPause?.();
       }
     },
+    seekTo: (seconds: number) => {
+      if (audioRef.current) {
+        audioRef.current.currentTime = seconds;
+      }
+    },
+    playSegment: (startMs: number, endMs: number, onEnd?: () => void) => {
+      if (audioRef.current) {
+        segmentRef.current = { endSec: endMs / 1000, onEnd };
+        audioRef.current.currentTime = startMs / 1000;
+        audioRef.current.play();
+        setIsPlaying(true);
+        onPlay?.();
+      }
+    },
+    clearSegment: () => {
+      segmentRef.current = null;
+    },
     isPlaying
   }));
 
@@ -57,6 +79,14 @@ const CustomAudioPlayer = forwardRef<AudioPlayerRef, {
     if (audio) {
       const updateProgress = () => {
         setCurrentTime(audio.currentTime);
+        // Segment end detection
+        if (segmentRef.current && audio.currentTime >= segmentRef.current.endSec) {
+          const { onEnd } = segmentRef.current;
+          segmentRef.current = null;
+          audio.pause();
+          setIsPlaying(false);
+          onEnd?.();
+        }
       };
 
       audio.addEventListener('timeupdate', updateProgress);
@@ -161,7 +191,7 @@ const CustomAudioPlayer = forwardRef<AudioPlayerRef, {
           max={duration || 0}
           value={currentTime}
           onChange={(e) => handleSeek(Number(e.target.value))}
-          className="w-full h-1.5 rounded-full bg-gray-200 dark:bg-gray-600 accent-blue-500 cursor-pointer"
+          className="w-full h-1.5 rounded-full bg-gray-200 dark:bg-gray-600 accent-gold-500 cursor-pointer"
         />
         <span className="text-xs text-gray-500 dark:text-gray-400 w-10 shrink-0">
           {formatTime(duration)}
@@ -172,14 +202,14 @@ const CustomAudioPlayer = forwardRef<AudioPlayerRef, {
       <div className="flex items-center justify-center gap-4">
         <button
           onClick={handlePlayPause}
-          className="p-3 bg-blue-500 hover:bg-blue-600 text-white rounded-full shadow-md transition-all duration-150 active:scale-95"
+          className="p-3 bg-gold-500 hover:bg-gold-600 text-gray-900 rounded-full shadow-md transition-all duration-150 active:scale-95"
         >
           {isPlaying ? <FaPause size={18} /> : <FaPlay size={18} />}
         </button>
 
         <button
           onClick={() => handleSeek(currentTime + 10)}
-          className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 rounded-lg transition-colors"
+          className="p-2 text-gray-500 dark:text-gray-400 hover:text-gold-600 dark:hover:text-gold-400 rounded-lg transition-colors"
           title="Skip 10s"
         >
           <FaForward size={18} />
@@ -201,7 +231,7 @@ const CustomAudioPlayer = forwardRef<AudioPlayerRef, {
               />
               <button
                 type="submit"
-                className="p-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
+                className="p-1 bg-gold-500 text-gray-900 rounded hover:bg-gold-600 text-sm"
               >
                 Set
               </button>
@@ -218,8 +248,8 @@ const CustomAudioPlayer = forwardRef<AudioPlayerRef, {
               onClick={() => setShowRepeatInput(true)}
               className={`p-2 rounded-lg transition-colors ${
                 repeatCount > 0
-                  ? 'text-blue-500 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30'
-                  : 'text-gray-500 dark:text-gray-400 hover:text-blue-500 dark:hover:text-blue-400'
+                  ? 'text-gold-600 dark:text-gold-400 bg-gold-50 dark:bg-gold-900/30'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gold-600 dark:hover:text-gold-400'
               }`}
               title={repeatCount > 0 ? `Repeating ${repeatCount} times` : 'Set repeat'}
             >

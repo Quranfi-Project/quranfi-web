@@ -1,3 +1,33 @@
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* Gold — brand accent matching logo #DCAA0F */
+  --color-gold-50:  #EDE5D0;
+  --color-gold-100: #FFF3CC;
+  --color-gold-200: #FFE799;
+  --color-gold-300: #F0C040;
+  --color-gold-400: #E8B520;
+  --color-gold-500: #DCAA0F;
+  --color-gold-600: #B8900C;
+  --color-gold-700: #8A6C09;
+  --color-gold-800: #5C4706;
+  --color-gold-900: #3D2F04;
+
+  /* Warm dark backgrounds */
+  --color-warm-800: #252218;
+  --color-warm-900: #1A1710;
+  --color-warm-950: #12100A;
+}
+
+@layer base {
+  html {
+    background-color: #EDE5D0;
+    color: #000000;
+  }
+  html.dark {
+    background-color: #111827;
+    color: #F9FAFB;
+  }
+}
