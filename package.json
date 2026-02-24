@@ -14,6 +14,7 @@
     "@capacitor/android": "^8.1.0",
     "@capacitor/cli": "^8.1.0",
     "@capacitor/core": "^8.1.0",
+    "@opennextjs/cloudflare": "^1.17.0",
     "@quranjs/api": "^2.1.0",
     "@supabase/supabase-js": "^2.49.4",
     "axios": "^1.8.2",
