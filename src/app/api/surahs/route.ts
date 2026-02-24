@@ -13,7 +13,7 @@ export async function GET() {
       surahNameArabic: c.nameArabic,
       surahNameTranslation: c.translatedName?.name ?? '',
       numberOfAyahs: c.versesCount,
-      revelationType: c.revelationPlace === 'meccan' ? 'Meccan' : 'Medinan',
+      revelationType: c.revelationPlace === 'makkah' ? 'Meccan' : 'Medinan',
     }));
     return NextResponse.json(data);
   } catch (error) {

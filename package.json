@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "build:capacitor": "BUILD_TARGET=capacitor next build",
+    "build:capacitor": "BUILD_TARGET=capacitor NEXT_PUBLIC_APP_URL=https://quranfi-web.vercel.app next build",
     "start": "next start",
     "lint": "next lint"
   },
@@ -29,6 +29,7 @@
     "tailwindcss": "^4.0.12"
   },
   "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
     "@eslint/js": "^9.21.0",
     "@tailwindcss/postcss": "^4.2.0",
     "@types/node": "^20.0.0",
