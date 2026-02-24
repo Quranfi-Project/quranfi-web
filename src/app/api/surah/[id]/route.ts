@@ -2,7 +2,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getQuranClient } from '@/lib/quranClient';
 
-export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
 const PER_PAGE = 50;

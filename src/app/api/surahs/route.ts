@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getQuranClient } from '@/lib/quranClient';
 
-export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
