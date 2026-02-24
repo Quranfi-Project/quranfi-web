@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
-import quranClient from '@/lib/quranClient';
+import { getQuranClient } from '@/lib/quranClient';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
+    const quranClient = getQuranClient();
     const chapters = await quranClient.chapters.findAll();
     const data = chapters.map((c) => ({
       number: c.id,
