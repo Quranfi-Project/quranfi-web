@@ -31,3 +31,5 @@ ios/
 .next/
 out/
 .open-next/
+.wrangler/
+

@@ -2,7 +2,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getQuranClient } from '@/lib/quranClient';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
+
+export function generateStaticParams() {
+  return Array.from({ length: 114 }, (_, i) => ({ id: String(i + 1) }));
+}
 
 const PER_PAGE = 50;
 const SAHEEH_INTERNATIONAL = 20;
@@ -69,6 +73,6 @@ export async function GET(
     });
   } catch (error) {
     console.error(`[/api/surah/${id}]`, error);
-    return NextResponse.json({ error: 'Failed to fetch surah' }, { status: 500 });
+    return NextResponse.json({});
   }
 }
