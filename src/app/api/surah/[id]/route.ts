@@ -1,6 +1,6 @@
 
 import { NextRequest, NextResponse } from 'next/server';
-import quranClient from '@/lib/quranClient';
+import { getQuranClient } from '@/lib/quranClient';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,6 +24,7 @@ export async function GET(
   }
 
   try {
+    const quranClient = getQuranClient();
     // Fetch chapter metadata + first page of verses in parallel
     const [chapter, firstPage] = await Promise.all([
       quranClient.chapters.findById(surahNumber as never),
