@@ -7,6 +7,7 @@ import { fetchSurahs } from '../utils/api';
 const SurahList = () => {
   const [surahs, setSurahs] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [revelationFilter, setRevelationFilter] = useState<'All' | 'Meccan' | 'Medinan'>('All');
 
   useEffect(() => {
     const loadSurahs = async () => {
@@ -18,18 +19,20 @@ const SurahList = () => {
 
   const filteredSurahs = surahs.filter((surah) => {
     const searchLower = searchTerm.toLowerCase();
-    return (
+    const matchesSearch =
       surah.surahName.toLowerCase().includes(searchLower) ||
       surah.surahNameArabic.includes(searchTerm) ||
       surah.surahNameTranslation.toLowerCase().includes(searchLower) ||
-      surah.number.toString().includes(searchTerm)
-    );
+      surah.number.toString().includes(searchTerm);
+    const matchesRevelation =
+      revelationFilter === 'All' || surah.revelationType === revelationFilter;
+    return matchesSearch && matchesRevelation;
   });
 
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4 dark:text-gray-100">Surahs</h1>
-      <div className="mb-6">
+      <div className="mb-6 flex flex-col gap-3">
         <input
           type="text"
           placeholder="Search surahs..."
@@ -41,6 +44,25 @@ const SurahList = () => {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
+        <div className="flex gap-2">
+          {(['All', 'Meccan', 'Medinan'] as const).map((type) => (
+            <button
+              key={type}
+              onClick={() => setRevelationFilter(type)}
+              className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                revelationFilter === type
+                  ? type === 'Meccan'
+                    ? 'bg-amber-500 dark:bg-amber-600 text-white'
+                    : type === 'Medinan'
+                    ? 'bg-teal-500 dark:bg-teal-600 text-white'
+                    : 'bg-gold-500 text-gray-900'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+              }`}
+            >
+              {type}
+            </button>
+          ))}
+        </div>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {filteredSurahs.map((surah) => (
