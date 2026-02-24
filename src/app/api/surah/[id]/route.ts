@@ -66,7 +66,7 @@ export async function GET(
       surahNameArabic: chapter.nameArabic,
       surahNameTranslation: chapter.translatedName?.name ?? '',
       numberOfAyahs: chapter.versesCount,
-      revelationType: chapter.revelationPlace === 'meccan' ? 'Meccan' : 'Medinan',
+      revelationType: chapter.revelationPlace === 'makkah' ? 'Meccan' : 'Medinan',
       arabic1: allVerses.map((v) => v.textUthmani ?? ''),
       english: allVerses.map((v) => stripHtml(v.translations?.[0]?.text ?? '')),
       globalAyahNumbers: allVerses.map((v) => v.id),
