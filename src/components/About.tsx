@@ -5,44 +5,44 @@ const About = () => {
   return (
     <div className="max-w-4xl mx-auto p-6">
       <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-4">About Quranify</h1>
-        <p className="text-xl text-gray-600 dark:text-gray-400">Connecting hearts with the Holy Quran</p>
+        <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-4">About Quranfi</h1>
+        <p className="text-xl text-gray-600 dark:text-gray-400">A modern web app for reading and listening to the Quran</p>
       </div>
 
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden mb-12 border border-gray-100 dark:border-gray-700">
         <div className="p-8">
-          <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-4">Our Mission</h2>
+          <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-4">What is Quranfi?</h2>
           <p className="text-gray-600 dark:text-gray-400 mb-6">
-            Quranify aims to provide a modern, accessible platform for engaging with the Holy Quran.
-            We combine traditional Islamic knowledge with contemporary technology to create a seamless
-            experience for Muslims worldwide.
+            Quranfi is a free, open-source platform for reading and listening to the Holy Quran.
+            Browse all 114 surahs with Arabic text, English transliterations, and translations —
+            then listen along with your choice of 300+ reciters. No account required.
           </p>
 
           <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-4">Features</h2>
           <ul className="grid md:grid-cols-2 gap-4 mb-6">
             <li className="flex items-start">
               <span className="text-green-500 mr-2">✓</span>
-              <span className="text-gray-700 dark:text-gray-300">Clean, distraction-free reading experience</span>
+              <span className="text-gray-700 dark:text-gray-300">All 114 surahs with Arabic, transliteration &amp; translation</span>
             </li>
             <li className="flex items-start">
               <span className="text-green-500 mr-2">✓</span>
-              <span className="text-gray-700 dark:text-gray-300">Multiple translations and tafsirs</span>
+              <span className="text-gray-700 dark:text-gray-300">Filter surahs by revelation type (Meccan / Medinan)</span>
             </li>
             <li className="flex items-start">
               <span className="text-green-500 mr-2">✓</span>
-              <span className="text-gray-700 dark:text-gray-300">Mobile-friendly design</span>
+              <span className="text-gray-700 dark:text-gray-300">Verse-by-verse or continuous reading mode</span>
             </li>
             <li className="flex items-start">
               <span className="text-green-500 mr-2">✓</span>
-              <span className="text-gray-700 dark:text-gray-300">Advanced search functionality</span>
+              <span className="text-gray-700 dark:text-gray-300">Full-chapter audio with 300+ reciters and rewayat</span>
             </li>
             <li className="flex items-start">
               <span className="text-green-500 mr-2">✓</span>
-              <span className="text-gray-700 dark:text-gray-300">Bookmarking and note-taking</span>
+              <span className="text-gray-700 dark:text-gray-300">Click any verse to jump to it in the audio</span>
             </li>
             <li className="flex items-start">
               <span className="text-green-500 mr-2">✓</span>
-              <span className="text-gray-700 dark:text-gray-300">Regular content updates</span>
+              <span className="text-gray-700 dark:text-gray-300">Adjustable Arabic font size, dark mode &amp; bookmarks</span>
             </li>
           </ul>
         </div>
@@ -65,7 +65,7 @@ const About = () => {
               <p className="text-gray-600 dark:text-gray-400 mb-4">
                 Software developer and Muslim entrepreneur passionate about creating technology
                 solutions that serve the Ummah. With a background in both computer science and
-                Islamic studies, I envisioned Quranify as a bridge between tradition and modernity.
+                Islamic studies, I envisioned Quranfi as a bridge between tradition and modernity.
               </p>
 
               <div className="flex flex-wrap gap-4">
