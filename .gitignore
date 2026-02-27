@@ -33,3 +33,4 @@ out/
 .open-next/
 .wrangler/
 
+tsconfig.tsbuildinfo
