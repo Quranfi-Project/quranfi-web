@@ -42,6 +42,18 @@ export const fetchVerseTimings = async (
   return result;
 };
 
+// Fetch word-by-word data (Arabic words, per-word translations, timing segments) for a surah
+export type WordData = {
+  words: Record<string, string[]>;        // verseKey → arabic word text array
+  translations: Record<string, string[]>; // verseKey → per-word English gloss array
+  segments: Record<string, [number, number, number, number][]>; // verseKey → [[wFrom,wTo,tFrom,tTo],...]
+};
+
+export const fetchWordData = async (surahId: number): Promise<WordData> => {
+  const response = await axios.get(`${APP_BASE}/api/surah/${surahId}/words`);
+  return response.data;
+};
+
 // Construct chapter audio URL from folder URL — e.g. "https://server10.mp3quran.net/ajm/001.mp3"
 export const getChapterAudioUrl = (folderUrl: string, surahNumber: number): string => {
   return `${folderUrl}${surahNumber.toString().padStart(3, '0')}.mp3`;

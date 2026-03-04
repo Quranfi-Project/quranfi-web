@@ -1,0 +1,92 @@
+[
+  {
+    "id": 1,
+    "title": "Implement Sidebar Navigation",
+    "description": "Add a mobile-friendly sidebar with surah list",
+    "status": "completed",
+    "type": "feature",
+    "completedDate": "2025-4-6"
+  },
+  {
+    "id": 2,
+    "title": "Add Search Functionality",
+    "description": "Enable searching across surahs and verses",
+    "status": "completed",
+    "type": "feature",
+    "completedDate": "2025-4-6"
+  },
+  {
+    "id": 3,
+    "title": "Fix Audio Playback Bug",
+    "description": "Audio sometimes continues playing when switching surahs",
+    "status": "completed",
+    "type": "bug",
+    "completedDate": "2025-4-12"
+  },
+  {
+    "id": 4,
+    "title": "Bookmark Feature",
+    "description": "Implement a bookmark feature",
+    "status": "completed",
+    "type": "feature",
+    "completedDate": "2025-5-03"
+  },
+  {
+    "id": 5,
+    "title": "Dark Mode Support",
+    "description": "Implement dark/light theme toggle",
+    "status": "completed",
+    "type": "enhancement",
+    "completedDate": "2026-2-22"
+  },
+  {
+    "id": 6,
+    "title": "Repeating Ayahs",
+    "description": "Add repeating Ayahs for memorization",
+    "status": "completed",
+    "type": "feature",
+    "completedDate": "2025-5-17"
+  },
+  {
+    "id": 7,
+    "title": "Fonts",
+    "description": "Add fonts and a font resizer for arabic",
+    "status": "completed",
+    "type": "feature",
+    "completedDate": "2025-5-17"
+  },
+  {
+    "id": 9,
+    "title": "Word by Word",
+    "description": "Add Word by Word Ayahs for memorization",
+    "status": "completed",
+    "type": "feature",
+    "targetDate": "2025-6-30",
+    "completedDate": "2026-3-3"
+  },
+  {
+    "id": 10,
+    "title": "Fixed a couple of bugs",
+    "description": "Fixed some repeating issues",
+    "status": "completed",
+    "type": "bug",
+    "targetDate": "2025-11-16"
+  },
+  {
+    "id": 11,
+    "title": "Updated Privacy Policy",
+    "description": "Removed Muslim Ads Network off the site",
+    "status": "completed",
+    "type": "enhancement",
+    "targetDate": "2025-12-27"
+  },
+  {
+    "title": "Fixed Number bug on Translation",
+    "description": "Removed the footnote numbers on translation ",
+    "status": "completed",
+    "type": "bug",
+    "targetDate": "2026-3-3",
+    "completedDate": "2026-3-3",
+    "id": 12
+  }
+]

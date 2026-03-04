@@ -19,7 +19,8 @@ const CustomAudioPlayer = forwardRef<AudioPlayerRef, {
   onPlay?: () => void;
   onPause?: () => void;
   onEnded?: () => void;
-}>(({ audioUrl, fallbackUrl, title, onPlay, onPause, onEnded }, ref) => {
+  onTimeUpdate?: (currentTime: number) => void;
+}>(({ audioUrl, fallbackUrl, title, onPlay, onPause, onEnded, onTimeUpdate }, ref) => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -30,6 +31,9 @@ const CustomAudioPlayer = forwardRef<AudioPlayerRef, {
   const [customRepeat, setCustomRepeat] = useState('1');
   const triedFallback = useRef(false);
   const segmentRef = useRef<{ endSec: number; onEnd?: () => void } | null>(null);
+  // Ref ensures the timeupdate handler always calls the latest onTimeUpdate without re-registering
+  const onTimeUpdateRef = useRef(onTimeUpdate);
+  useEffect(() => { onTimeUpdateRef.current = onTimeUpdate; }, [onTimeUpdate]);
 
   // Reset state when audioUrl changes
   useEffect(() => {
@@ -79,6 +83,7 @@ const CustomAudioPlayer = forwardRef<AudioPlayerRef, {
     if (audio) {
       const updateProgress = () => {
         setCurrentTime(audio.currentTime);
+        onTimeUpdateRef.current?.(audio.currentTime);
         // Segment end detection
         if (segmentRef.current && audio.currentTime >= segmentRef.current.endSec) {
           const { onEnd } = segmentRef.current;

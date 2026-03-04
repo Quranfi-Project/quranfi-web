@@ -1,19 +1,18 @@
-/* @font-face  {
-    font-family: 'KFQF', serif;
-    src: url('/fonts/HafsNastaleeqVer10.otf') format('opentype'),
-    url('../fonts/HafsNastaleeqVer10.woff') format('woff'),
+@font-face {
+  font-family: 'HafsNastaleeqVer10';
+  src: url('/fonts/HafsNastaleeqVer10.woff2') format('woff2'),
+       url('/fonts/HafsNastaleeqVer10.woff') format('woff'),
+       url('/fonts/HafsNastaleeqVer10.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
 
-         url('../fonts/HafsNastaleeqVer10.woff2') format('woff2');
-    font-weight: normal;
-    font-style: normal;
-  } */
+.font-arabic {
+  font-family: 'HafsNastaleeqVer10', 'Amiri Quran', 'Scheherazade New', serif;
+}
 
-
- .font-arabic{
-    font-family: 'Amiri Quran', 'Scheherazade New', serif;
- }
-
- /* For Uthmani script (reading mode) — Amiri Quran has full support for Quranic annotation marks */
- .font-arabic-quran {
-    font-family: 'Amiri Quran', 'HafsNastaleeqVer10', Arial, sans-serif;
- }
+/* For Uthmani script (reading mode) */
+.font-arabic-quran {
+  font-family: 'HafsNastaleeqVer10', 'Amiri Quran', Arial, sans-serif;
+}
