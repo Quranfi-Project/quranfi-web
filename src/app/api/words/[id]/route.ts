@@ -106,7 +106,7 @@ export async function GET(
 
     return NextResponse.json({ words, translations, segments });
   } catch (error) {
-    console.error(`[/api/surah/${id}/words]`, error);
+    console.error(`[/api/words/${id}]`, error);
     return NextResponse.json({ words: {}, translations: {}, segments: {} });
   }
 }

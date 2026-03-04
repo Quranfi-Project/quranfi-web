@@ -50,7 +50,7 @@ export type WordData = {
 };
 
 export const fetchWordData = async (surahId: number): Promise<WordData> => {
-  const response = await axios.get(`${APP_BASE}/api/surah/${surahId}/words`);
+  const response = await axios.get(`${APP_BASE}/api/words/${surahId}`);
   return response.data;
 };
 
