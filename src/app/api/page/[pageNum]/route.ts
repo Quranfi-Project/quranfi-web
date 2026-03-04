@@ -50,8 +50,8 @@ export async function GET(
         verseNumber: v.verseNumber,
         arabic: v.textUthmani ?? '',
         translation: stripHtml(v.translations?.[0]?.text ?? ''),
-        chapterName: chapterMap[v.chapterId]?.nameSimple ?? '',
-        chapterNameArabic: chapterMap[v.chapterId]?.nameArabic ?? '',
+        chapterName: chapterMap[v.chapterId!]?.nameSimple ?? '',
+        chapterNameArabic: chapterMap[v.chapterId!]?.nameArabic ?? '',
       })),
     });
   } catch (error) {
