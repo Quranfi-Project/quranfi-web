@@ -27,14 +27,17 @@ export async function GET(
     const quranClient = getQuranClient();
 
     const verses = await quranClient.verses.findByPage(pageNumber as never, {
-      fields: { textUthmani: true },
+      fields: { textUthmani: true, chapterId: true } as never,
       translations: [SAHEEH_INTERNATIONAL],
       words: false,
-      perPage: 50,
     });
 
+    // Parse chapter number from verseKey ("1:1" → 1) as reliable fallback
+    const getChapterNum = (v: (typeof verses)[0]) =>
+      v.chapterId ?? Number(v.verseKey?.split(':')[0]);
+
     // Fetch unique chapter metadata for surah headers
-    const chapterIds = [...new Set(verses.map(v => v.chapterId))];
+    const chapterIds = [...new Set(verses.map(v => getChapterNum(v)).filter(Boolean))];
     const chapters = await Promise.all(
       chapterIds.map(id => quranClient.chapters.findById(id as never))
     );
@@ -44,15 +47,18 @@ export async function GET(
 
     return NextResponse.json({
       pageNumber,
-      verses: verses.map(v => ({
-        verseKey: v.verseKey,
-        chapterNumber: v.chapterId,
-        verseNumber: v.verseNumber,
-        arabic: v.textUthmani ?? '',
-        translation: stripHtml(v.translations?.[0]?.text ?? ''),
-        chapterName: chapterMap[v.chapterId!]?.nameSimple ?? '',
-        chapterNameArabic: chapterMap[v.chapterId!]?.nameArabic ?? '',
-      })),
+      verses: verses.map(v => {
+        const chapterNum = getChapterNum(v);
+        return {
+          verseKey: v.verseKey,
+          chapterNumber: chapterNum,
+          verseNumber: v.verseNumber,
+          arabic: v.textUthmani ?? '',
+          translation: stripHtml(v.translations?.[0]?.text ?? ''),
+          chapterName: chapterMap[chapterNum]?.nameSimple ?? '',
+          chapterNameArabic: chapterMap[chapterNum]?.nameArabic ?? '',
+        };
+      }),
     });
   } catch (error) {
     console.error(`[/api/page/${pageNum}]`, error);
