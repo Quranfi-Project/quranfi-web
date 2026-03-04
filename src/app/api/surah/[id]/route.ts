@@ -13,7 +13,10 @@ const SAHEEH_INTERNATIONAL = 20;
 
 // Strip HTML tags from translation text (footnotes use <sup> etc.)
 function stripHtml(html: string): string {
-  return html.replace(/<[^>]*>/g, '').trim();
+  return html
+    .replace(/<sup[^>]*>.*?<\/sup>/gi, '') // Remove footnote superscripts and their content
+    .replace(/<[^>]*>/g, '')
+    .trim();
 }
 
 export async function GET(

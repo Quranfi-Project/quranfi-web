@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { fetchSurah, fetchReciters, fetchVerseTimings, getChapterAudioUrl } from '../utils/api';
+import { fetchSurah, fetchReciters, fetchVerseTimings, fetchWordData, getChapterAudioUrl, WordData } from '../utils/api';
 import CustomAudioPlayer, { AudioPlayerRef } from './AudioPlayer';
 import { FaPlay, FaPause, FaArrowLeft, FaRegBookmark, FaBookmark, FaCog, FaTimes, FaSearch, FaBookOpen, FaList } from 'react-icons/fa';
 import { addBookmark, getBookmarks, removeBookmark as removeBookmarkDB } from '../utils/bookmarksDB';
@@ -28,6 +28,13 @@ const SurahDetail = () => {
   const [, setCurrentRepeat] = useState<number>(0);
   const [reciterSearch, setReciterSearch] = useState('');
   const [readingMode, setReadingMode] = useState(false);
+
+  // Word-by-word highlighting state
+  const [wordData, setWordData] = useState<WordData | null>(null);
+  // playingVerseIndex: which verse is currently highlighted (set by timeupdate, independent of currentVerseIndex)
+  const [playingVerseIndex, setPlayingVerseIndex] = useState<number | null>(null);
+  // activeWord: 0-based word range being highlighted in playingVerseIndex
+  const [activeWord, setActiveWord] = useState<{ from: number; to: number } | null>(null);
 
   const chapterAudioPlayerRef = useRef<AudioPlayerRef>(null);
 
@@ -96,7 +103,7 @@ const SurahDetail = () => {
   };
 
   // -------------------------------
-  // Load Surah + Reciters
+  // Load Surah + Reciters + Word Data
   // -------------------------------
   useEffect(() => {
     const loadData = async () => {
@@ -115,13 +122,25 @@ const SurahDetail = () => {
       }
     };
     loadData();
+
+    // Fetch word data in parallel — non-blocking, gracefully ignored on failure
+    fetchWordData(Number(surahNumber))
+      .then(setWordData)
+      .catch(() => setWordData(null));
   }, [surahNumber]);
 
   // Re-fetch verse timings when reciter or surah changes
   useEffect(() => {
     if (!surahNumber || !selectedReciter) return;
     fetchVerseTimings(Number(surahNumber), selectedReciter)
-      .then(setVerseTimings)
+      .then(timings => {
+        setVerseTimings(timings);
+        // Pre-seek past any ta'awwudh prefix (some reciters prepend it before verse 1)
+        const verse1 = timings[`${surahNumber}:1`];
+        if (verse1 && verse1.startTime > 500) {
+          chapterAudioPlayerRef.current?.seekTo(verse1.startTime / 1000);
+        }
+      })
       .catch(() => setVerseTimings({}));
   }, [selectedReciter, surahNumber]);
 
@@ -134,6 +153,8 @@ const SurahDetail = () => {
     setIsPlaying(false);
     setCurrentVerseIndex(null);
     setCurrentRepeat(0);
+    setPlayingVerseIndex(null);
+    setActiveWord(null);
   };
 
   const handleVerseAudio = (index: number) => {
@@ -165,12 +186,80 @@ const SurahDetail = () => {
             setIsPlaying(false);
             setCurrentVerseIndex(null);
             setCurrentRepeat(0);
+            setPlayingVerseIndex(null);
+            setActiveWord(null);
           }
         }
       );
     };
 
     playWithRepeat(0);
+  };
+
+  // -------------------------------
+  // Word-by-word time handler
+  // Called on every timeupdate from AudioPlayer (~4x/sec)
+  // -------------------------------
+  const handleTimeUpdate = (currentTime: number) => {
+    if (!wordData || !surah) return;
+
+    const currentTimeMs = currentTime * 1000;
+    let newVerseIndex: number | null = null;
+
+    if (currentVerseIndex !== null) {
+      // Verse-level playback via verse button
+      newVerseIndex = currentVerseIndex;
+    } else {
+      // Chapter-level playback — find current verse from timing
+      for (let i = 0; i < surah.arabic1.length; i++) {
+        const timing = verseTimings[`${surah.surahNo}:${i + 1}`];
+        if (timing && currentTimeMs >= timing.startTime && currentTimeMs < timing.endTime) {
+          newVerseIndex = i;
+          break;
+        }
+      }
+    }
+
+    if (newVerseIndex === null) {
+      if (playingVerseIndex !== null) {
+        setPlayingVerseIndex(null);
+        setActiveWord(null);
+      }
+      return;
+    }
+
+    // Update playing verse index when it changes
+    if (newVerseIndex !== playingVerseIndex) {
+      setPlayingVerseIndex(newVerseIndex);
+      setActiveWord(null);
+    }
+
+    const verseKey = `${surah.surahNo}:${newVerseIndex + 1}`;
+    const timing = verseTimings[verseKey];
+    const segments = wordData.segments[verseKey];
+    if (!timing || !segments?.length) return;
+
+    const verseDuration = timing.endTime - timing.startTime;
+    if (verseDuration <= 0) return;
+
+    // Proportionally scale: elapsed time within this verse → QF reference time
+    const verseElapsed = currentTimeMs - timing.startTime;
+    const qfVerseDuration = segments[segments.length - 1][3]; // timeTo of last segment
+    if (qfVerseDuration <= 0) return;
+
+    const qfTime = (verseElapsed / verseDuration) * qfVerseDuration;
+
+    // Find which segment qfTime falls in
+    for (const [wFrom, wTo, tFrom, tTo] of segments) {
+      if (qfTime >= tFrom && qfTime < tTo) {
+        const from = wFrom - 1; // segments are 1-based → 0-based
+        const to = wTo - 1;
+        if (activeWord?.from !== from || activeWord?.to !== to) {
+          setActiveWord({ from, to });
+        }
+        return;
+      }
+    }
   };
 
   // -------------------------------
@@ -400,15 +489,56 @@ const SurahDetail = () => {
           border border-gray-100 dark:border-gray-700">
           <div className={`${getFontSizeClass(fontSize)} font-arabic text-right
             text-gray-900 dark:text-gray-100`} dir="rtl">
-            {surah.arabic1.map((ayah: string, index: number) => (
-              <span key={index} className="inline leading-[3.5rem]">
-                {ayah}{' '}
-                <span className="text-gold-600 dark:text-gold-400 text-base">
-                  ﴿{convertToArabicNumerals(index + 1)}﴾
+            {surah.arabic1.map((ayah: string, index: number) => {
+              const verseKey = `${surah.surahNo}:${index + 1}`;
+              // Split the original arabic1 text so the font renders identically to before;
+              // wordData.words uses different Unicode that HafsNastaleeq can't render properly
+              const verseWords = wordData?.translations[verseKey]
+                ? ayah.split(/\s+/).filter(Boolean)
+                : null;
+              const isVerseActive = playingVerseIndex === index;
+
+              return (
+                <span key={index} className="inline leading-[3.5rem]">
+                  {verseWords ? (
+                    verseWords.map((word: string, wi: number) => {
+                      const isWordActive = isVerseActive && activeWord !== null &&
+                        wi >= activeWord.from && wi <= activeWord.to;
+                      const gloss = wordData?.translations[verseKey]?.[wi];
+                      return (
+                        <span key={wi} className="relative group inline cursor-default">
+                          <span className={`transition-colors duration-150 ${
+                            isWordActive
+                              ? 'text-gold-500 dark:text-gold-400 rounded px-0.5'
+                              : ''
+                          }`}>
+                            {word}{' '}
+                          </span>
+                          {gloss && (
+                            <span className="absolute bottom-[calc(100%+6px)] left-1/2 -translate-x-1/2
+                              opacity-0 group-hover:opacity-100 transition-opacity duration-150
+                              pointer-events-none z-20">
+                              <span className="block bg-gray-900/95 dark:bg-gray-700 text-white font-sans
+                                font-normal text-xs not-italic rounded-lg px-2.5 py-1.5 whitespace-nowrap shadow-xl">
+                                {gloss}
+                              </span>
+                              <span className="block w-2 h-2 bg-gray-900/95 dark:bg-gray-700
+                                rotate-45 rounded-sm mx-auto -mt-1" />
+                            </span>
+                          )}
+                        </span>
+                      );
+                    })
+                  ) : (
+                    <>{ayah}{' '}</>
+                  )}
+                  <span className="text-gold-600 dark:text-gold-400 text-base">
+                    ﴿{convertToArabicNumerals(index + 1)}﴾
+                  </span>
+                  {' '}
                 </span>
-                {' '}
-              </span>
-            ))}
+              );
+            })}
           </div>
         </div>
       ) : (
@@ -417,6 +547,12 @@ const SurahDetail = () => {
           {surah.arabic1.map((ayah: string, index: number) => {
             const verseId = getVerseId(index);
             const isBookmarked = bookmarks.has(verseId);
+            const verseKey = `${surah.surahNo}:${index + 1}`;
+            const verseTranslations = wordData?.translations[verseKey];
+            // Use the original arabic1 text split by spaces — same Unicode as before, renders
+            // correctly with HafsNastaleeq; API word Unicode differs and breaks the font
+            const verseWords = verseTranslations ? ayah.split(/\s+/).filter(Boolean) : null;
+            const isVerseActive = playingVerseIndex === index;
 
             return (
               <div
@@ -446,13 +582,13 @@ const SurahDetail = () => {
                     <button
                       onClick={() => handleVerseAudio(index)}
                       className={`p-2 rounded-full transition-colors ${
-                        verseTimings[`${surah.surahNo}:${index + 1}`]
+                        verseTimings[verseKey]
                           ? currentVerseIndex === index && isPlaying
                             ? 'bg-gold-600 text-gray-900 shadow-md shadow-gold-200 dark:shadow-gold-900/40'
                             : 'bg-gold-500 hover:bg-gold-600 text-gray-900'
                           : 'bg-gray-100 dark:bg-gray-700 text-gray-300 dark:text-gray-600 cursor-not-allowed'
                       }`}
-                      disabled={!verseTimings[`${surah.surahNo}:${index + 1}`]}
+                      disabled={!verseTimings[verseKey]}
                     >
                       {currentVerseIndex === index && isPlaying
                         ? <FaPause size={14} />
@@ -461,11 +597,49 @@ const SurahDetail = () => {
                   </div>
                 </div>
 
-                {/* Arabic text */}
-                <p className={`${getFontSizeClass(fontSize)} font-arabic text-right
-                  text-gray-900 dark:text-gray-100 leading-loose`} dir="rtl">
-                  {ayah} <span className="text-gold-500 dark:text-gold-400">﴿{convertToArabicNumerals(index + 1)}﴾</span>
-                </p>
+                {/* Arabic text — word spans with hover tooltip meanings */}
+                {verseWords ? (
+                  <p className={`${getFontSizeClass(fontSize)} font-arabic text-right
+                    text-gray-900 dark:text-gray-100 leading-loose`} dir="rtl">
+                    {verseWords.map((word: string, wi: number) => {
+                      const isWordActive = isVerseActive && activeWord !== null &&
+                        wi >= activeWord.from && wi <= activeWord.to;
+                      const gloss = verseTranslations?.[wi];
+                      return (
+                        <span key={wi} className="relative group inline cursor-default">
+                          <span className={`transition-colors duration-150 ${
+                            isWordActive
+                              ? 'text-gold-500 dark:text-gold-400  rounded px-0.5'
+                              : ''
+                          }`}>
+                            {word}{' '}
+                          </span>
+                          {gloss && (
+                            <span className="absolute bottom-[calc(100%+6px)] left-1/2 -translate-x-1/2
+                              opacity-0 group-hover:opacity-100 transition-opacity duration-150
+                              pointer-events-none z-20">
+                              <span className="block bg-gray-900/95 dark:bg-gray-700 text-white font-sans
+                                font-normal text-xs not-italic rounded-lg px-2.5 py-1.5 whitespace-nowrap shadow-xl">
+                                {gloss}
+                              </span>
+                              <span className="block w-2 h-2 bg-gray-900/95 dark:bg-gray-700
+                                rotate-45 rounded-sm mx-auto -mt-1" />
+                            </span>
+                          )}
+                        </span>
+                      );
+                    })}
+                    {' '}
+                    <span className="text-gold-500 dark:text-gold-400 text-base">
+                      ﴿{convertToArabicNumerals(index + 1)}﴾
+                    </span>
+                  </p>
+                ) : (
+                  <p className={`${getFontSizeClass(fontSize)} font-arabic text-right
+                    text-gray-900 dark:text-gray-100 leading-loose`} dir="rtl">
+                    {ayah} <span className="text-gold-500 dark:text-gold-400">﴿{convertToArabicNumerals(index + 1)}﴾</span>
+                  </p>
+                )}
 
                 {/* English translation */}
                 <p className="text-base text-gray-600 dark:text-gray-400 leading-relaxed border-t
@@ -486,6 +660,7 @@ const SurahDetail = () => {
             ref={chapterAudioPlayerRef}
             audioUrl={chapterAudioUrl}
             title={`${surah.surahName} — ${surah.surahNameArabic}`}
+            onTimeUpdate={handleTimeUpdate}
             onPlay={() => {
               if (currentVerseIndex !== null) {
                 chapterAudioPlayerRef.current?.clearSegment();
